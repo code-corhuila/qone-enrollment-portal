@@ -1,0 +1,23 @@
+# dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# environment and secrets (norm 15.8): never versioned
+.env
+.env.*
+!.env.example
+keys/
+*.pem
+
+# editors, agents and OS
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+*.log
