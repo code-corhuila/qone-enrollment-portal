@@ -87,7 +87,8 @@ describe("EnrollPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("t-w1");
     await user.click(screen.getByRole("button", { name: "Enroll in group 1" }));
 
-    expect(await screen.findByRole("status", { name: "Enrollment result" })).toHaveTextContent("Enrollment confirmed");
+    // The page polls a RUNNING saga once per second: allow a few polls before asserting.
+    expect(await screen.findByRole("status", { name: "Enrollment result" }, { timeout: 5000 })).toHaveTextContent("Enrollment confirmed");
     expect(keys).toHaveLength(2);
     expect(keys[0]).toBe(keys[1]);
     expect(keys[0]).toMatch(/^enroll-/);
