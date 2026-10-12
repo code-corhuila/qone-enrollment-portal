@@ -12,7 +12,7 @@ function renderPage() {
     <MemoryRouter initialEntries={["/pensum"]}>
       <Routes>
         <Route path="/pensum" element={<PensumPage />} />
-        <Route path="/enroll/:code" element={<p>enroll flow</p>} />
+        <Route path="/pensum/enroll/:code" element={<p>enroll flow</p>} />
       </Routes>
     </MemoryRouter>,
   );
