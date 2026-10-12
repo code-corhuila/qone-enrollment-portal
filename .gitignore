@@ -21,3 +21,6 @@ Thumbs.db
 # logs
 npm-debug.log*
 *.log
+
+# vite cache created by the dev server when run with --prefix
+.vite/
