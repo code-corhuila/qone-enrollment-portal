@@ -3,6 +3,7 @@ import { enrollmentApi } from "../../api/enrollmentApi";
 import { RequireRole } from "../../components/RequireRole";
 import { RequestFailure } from "../../components/RequestFailure";
 import { useRequest } from "../../hooks/useRequest";
+import { useMountBase } from "../../hooks/useMountBase";
 import type { PensumState, PensumSubject } from "../../model/enrollment";
 
 const STATE_TEXT: Record<PensumState, string> = { PASSED: "Passed", IN_PROGRESS: "In progress", AVAILABLE: "Available", LOCKED: "Locked" };
@@ -52,6 +53,7 @@ function Pensum() {
 }
 
 function SubjectRow({ subject }: { subject: PensumSubject }) {
+  const base = useMountBase();
   return (
     <tr>
       <th scope="row">
@@ -62,7 +64,7 @@ function SubjectRow({ subject }: { subject: PensumSubject }) {
         {STATE_TEXT[subject.state]}
         {subject.state === "LOCKED" ? ` (missing ${subject.missingPrerequisites.join(", ")})` : ""}
       </td>
-      <td>{subject.state === "AVAILABLE" ? <Link to={`../enroll/${subject.code}`}>Enroll</Link> : null}</td>
+      <td>{subject.state === "AVAILABLE" ? <Link to={`${base}/enroll/${subject.code}`}>Enroll</Link> : null}</td>
     </tr>
   );
 }
