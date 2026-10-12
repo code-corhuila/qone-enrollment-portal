@@ -14,7 +14,8 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "check:isolation": "sh scripts/check-isolation.sh"
+    "check:isolation": "sh scripts/check-isolation.sh",
+    "contracts:sync": "sh scripts/sync-contracts.sh"
   },
   "dependencies": {
     "react": "^19.1.0",

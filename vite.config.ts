@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
             federation({
               name: "enrollment",
               filename: "remoteEntry.js",
-              exposes: { "./App": "./src/enrollment/App.tsx" },
+              exposes: { "./App": "./src/enrollment/App.tsx", "./mocks": "./src/mocks/remote.ts" },
               remotes: { shell: { type: "module", name: "shell", entry: shellEntry } },
               shared: {
                 react: { singleton: true },
