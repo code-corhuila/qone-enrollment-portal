@@ -1,6 +1,16 @@
-import type { RequestHandler } from "msw";
+import { http, HttpResponse } from "msw";
+import type { Msw } from "../msw";
+import { catalogHandlers } from "./catalog";
+import { certificateHandlers } from "./certificates";
+import { enrollmentHandlers } from "./enrollment";
+import { workflowHandlers } from "./workflow";
 
-// The MSW handlers of the enrollment portal: the enrollment operations (EN-01..EN-14), the
-// saga (WF-01..WF-03) and the catalog reads the enroll flow needs. Added with the screens that
-// use them; fixtures are the seed of qone-enrollment-db (06-data) validated against the contract.
-export const handlers: RequestHandler[] = [];
+// Every handler of the enrollment portal, built with the given msw primitives (ADR-009): the
+// enrollment operations (EN-xx), the certificates, the enroll-student saga (WF-xx) and the
+// catalog reads the enroll flow needs.
+export function createHandlers(msw: Msw) {
+  return [...enrollmentHandlers(msw), ...certificateHandlers(msw), ...workflowHandlers(msw), ...catalogHandlers(msw)];
+}
+
+/** The handlers for this portal's own tests (Node server in src/mocks/server.ts). */
+export const handlers = createHandlers({ http, HttpResponse });

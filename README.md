@@ -10,7 +10,8 @@ Governance and documentation live in [`qone-docs`](https://github.com/code-corhu
 The web portal of the **enrollment** domain (course norm 5.4, Annex H): the academic record
 and the pensum, the enrollment of a section through the `enroll-student` saga, the weekly
 schedule, the verifiable certificates and the roster a professor reads. It is a Module
-Federation **remote** named `enrollment` that exposes `./App`; `qone-front` mounts it at `/enrollment/*`. The portal owns only its screens: the HTTP
+Federation **remote** named `enrollment` that exposes `./App` (and `./mocks` for synthetic
+data); `qone-front` mounts it at `/enrollment/*`. The portal owns only its screens: the HTTP
 client and the session come from the shell and the portal never knows the gateway URL or the
 token (norm 5.4.1, verified on the built bundle by `scripts/check-isolation.sh`).
 
