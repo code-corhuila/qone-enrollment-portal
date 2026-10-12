@@ -1,0 +1,28 @@
+# The catalog remote as qone-infra composes it (Annex G). The image is built with the shell's
+# origin; the port is published to the host only in develop (PORTAL_PORT), where the browser
+# downloads remoteEntry.js directly; in qa and main the shell's static route serves it.
+services:
+  qone-catalog-portal:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        VITE_SHELL_URL: ${VITE_SHELL_URL:-http://localhost:5173}
+    image: qone-catalog-portal:${IMAGE_TAG:-dev}
+    container_name: qone-catalog-portal
+    restart: unless-stopped
+    expose:
+      - "80"
+    ports:
+      - "${PORTAL_PORT:-5002}:80"
+    networks:
+      - platform
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+networks:
+  platform:
+    external: true
