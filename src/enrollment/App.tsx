@@ -1,4 +1,5 @@
 import { Link, Navigate, Route, Routes } from "react-router";
+import { EnrollPage } from "./pages/student/EnrollPage";
 import { MyEnrollmentsPage } from "./pages/student/MyEnrollmentsPage";
 import { PensumPage } from "./pages/student/PensumPage";
 import { SchedulePage } from "./pages/student/SchedulePage";
@@ -22,6 +23,7 @@ export function App() {
         <Route path="pensum" element={<PensumPage />} />
         <Route path="enrollments" element={<MyEnrollmentsPage />} />
         <Route path="schedule" element={<SchedulePage />} />
+        <Route path="enroll/:code" element={<EnrollPage />} />
       </Routes>
     </section>
   );
