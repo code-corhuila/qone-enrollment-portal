@@ -1,4 +1,5 @@
 import type { Msw } from "../msw";
+import { callerOf } from "../caller";
 import type { Enrollment, RejectionReason, Saga, SagaStep, StartEnrollStudent } from "../../enrollment/model/enrollment";
 import { sections, subjects, TERM } from "../fixtures/catalog";
 import { activeEnrollments, enrollmentFixtures, slotsOverlap, tuition } from "../fixtures/enrollment";
@@ -58,12 +59,7 @@ function runSaga(body: StartEnrollStudent): Saga {
 export function workflowHandlers({ http, HttpResponse }: Msw) {
   const envelope = (status: number, error: string, message: string, details?: Array<{ field: string; message: string }>) =>
     HttpResponse.json({ error, message, ...(details ? { details } : {}), traceId: crypto.randomUUID() }, { status });
-  const caller = (request: Request) => {
-    const auth = request.headers.get("authorization") ?? "";
-    if (!auth.startsWith("Bearer ")) return undefined;
-    const [, role = "", userId = ""] = auth.slice(7).split(".");
-    return { role, userId };
-  };
+  const caller = callerOf;
 
   return [
     http.get("*/api/v1/sagas/health", () => HttpResponse.json({ status: "ok", service: "qone-workflow", version: "2.0.0" })),
