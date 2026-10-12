@@ -1,4 +1,5 @@
 import { Link, Navigate, Route, Routes } from "react-router";
+import { RosterPage } from "./pages/professor/RosterPage";
 import { CertificatesPage } from "./pages/student/CertificatesPage";
 import { EnrollPage } from "./pages/student/EnrollPage";
 import { MyEnrollmentsPage } from "./pages/student/MyEnrollmentsPage";
@@ -26,6 +27,7 @@ export function App() {
         <Route path="schedule" element={<SchedulePage />} />
         <Route path="enroll/:code" element={<EnrollPage />} />
         <Route path="certificates" element={<CertificatesPage />} />
+        <Route path="sections/:sectionId/roster" element={<RosterPage />} />
       </Routes>
     </section>
   );
