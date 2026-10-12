@@ -1,20 +1,16 @@
 import type { Msw } from "../msw";
+import { callerOf } from "../caller";
 import { paginate, sections } from "../fixtures/catalog";
 import { activeEnrollments, enrollmentFixtures, pensumOf } from "../fixtures/enrollment";
 
 // MSW handlers of qone-enrollment-api, read operations: EN-01 health, EN-02 record, EN-03
 // pensum, EN-07 my enrollments, EN-08 one enrollment, EN-09 schedule, EN-10 roster. The stub
-// token is "test-token.<ROLE>.<userId>" (the real one carries sub and role in its claims).
+// caller comes from the stub token of the tests or from the claims of the shell's JWT (caller.ts).
 export function enrollmentHandlers({ http, HttpResponse }: Msw) {
   const envelope = (status: number, error: string, message: string, details?: Array<{ field: string; message: string }>) =>
     HttpResponse.json({ error, message, ...(details ? { details } : {}), traceId: crypto.randomUUID() }, { status });
 
-  const caller = (request: Request): { role: string; userId: string } | undefined => {
-    const auth = request.headers.get("authorization") ?? "";
-    if (!auth.startsWith("Bearer ")) return undefined;
-    const [, role = "", userId = ""] = auth.slice(7).split(".");
-    return { role, userId };
-  };
+  const caller = callerOf;
 
   const pageParams = (url: URL) => ({ page: Number(url.searchParams.get("page") ?? "1"), limit: Number(url.searchParams.get("limit") ?? "20") });
 
