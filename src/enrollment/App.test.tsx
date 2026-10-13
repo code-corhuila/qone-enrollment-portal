@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router";
 import { enrollmentFixtures } from "../mocks/fixtures/enrollment";
 import { testSession } from "../test/shell/session";
@@ -22,5 +22,20 @@ describe("enrollment App", () => {
     expect(screen.getByRole("link", { name: "Schedule" })).toHaveAttribute("href", "/enrollment/schedule");
     expect(await screen.findByRole("heading", { level: 3, name: "My pensum" })).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Enroll" })[0]).toHaveAttribute("href", "/enrollment/enroll/ISW-602");
+  });
+
+  it("marks the tab of the current page so the shell can draw it as active", async () => {
+    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    render(
+      <MemoryRouter initialEntries={["/enrollment/schedule"]}>
+        <Routes>
+          <Route path="/enrollment/*" element={<App />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    const tabs = screen.getByRole("navigation", { name: "Enrollment" });
+    expect(within(tabs).getByRole("link", { name: "Schedule" })).toHaveAttribute("aria-current", "page");
+    expect(within(tabs).getByRole("link", { name: "Pensum" })).not.toHaveAttribute("aria-current");
   });
 });
