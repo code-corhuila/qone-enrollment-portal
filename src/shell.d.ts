@@ -16,6 +16,14 @@ declare module "shell/apiClient" {
     put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
     patch<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
     del<T = undefined>(path: string, options?: RequestOptions): Promise<T>;
+    /** GET of a binary (the certificate PDF); errors come as the usual ApiError. */
+    download(path: string, options?: RequestOptions & { accept?: string }): Promise<Download>;
+  }
+  export interface Download {
+    blob: Blob;
+    contentType: string;
+    filename?: string;
+    headers: Headers;
   }
   export const apiClient: ApiClient;
   export const DEFAULT_TIMEOUT_MS: number;

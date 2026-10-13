@@ -1,4 +1,6 @@
 import { Link, Navigate, Route, Routes } from "react-router";
+import { RosterPage } from "./pages/professor/RosterPage";
+import { CertificatesPage } from "./pages/student/CertificatesPage";
 import { EnrollPage } from "./pages/student/EnrollPage";
 import { MyEnrollmentsPage } from "./pages/student/MyEnrollmentsPage";
 import { PensumPage } from "./pages/student/PensumPage";
@@ -15,7 +17,7 @@ export function App() {
     <section aria-labelledby="enrollment-title">
       <h2 id="enrollment-title">Enrollment</h2>
       <nav aria-label="Enrollment">
-        <Link to={`${base}/pensum`}>Pensum</Link> <Link to={`${base}/enrollments`}>My enrollments</Link> <Link to={`${base}/schedule`}>Schedule</Link>
+        <Link to={`${base}/pensum`}>Pensum</Link> <Link to={`${base}/enrollments`}>My enrollments</Link> <Link to={`${base}/schedule`}>Schedule</Link> <Link to={`${base}/certificates`}>Certificates</Link>
       </nav>
       <Routes>
         {/* The index redirects so every page has its own route segment and relative links resolve under the mount. */}
@@ -24,6 +26,8 @@ export function App() {
         <Route path="enrollments" element={<MyEnrollmentsPage />} />
         <Route path="schedule" element={<SchedulePage />} />
         <Route path="enroll/:code" element={<EnrollPage />} />
+        <Route path="certificates" element={<CertificatesPage />} />
+        <Route path="sections/:sectionId/roster" element={<RosterPage />} />
       </Routes>
     </section>
   );
