@@ -29,4 +29,6 @@ export const enrollmentApi = {
   myCertificates: (query: PageQuery = {}, signal?: AbortSignal) => apiClient.get<Page<Certificate>>(`${BASE}/certificates/me`, opts({ query }, signal)),
   /** EN-13. One Idempotency-Key per intention, reused on retry (norm 5.4.2). */
   issueCertificate: (type: CertificateType, idempotencyKey: string) => apiClient.post<Certificate>(`${BASE}/certificates`, { type }, { idempotencyKey }),
+  /** EN-14: the PDF, rendered once when it was issued; X-Verification-Code carries the public code. */
+  certificatePdf: (id: string) => apiClient.download(`${BASE}/certificates/${encodeURIComponent(id)}/pdf`),
 };
