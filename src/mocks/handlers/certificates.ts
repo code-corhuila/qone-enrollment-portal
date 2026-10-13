@@ -36,6 +36,15 @@ export function certificateHandlers({ http, HttpResponse }: Msw) {
       return HttpResponse.json(paginate(rows, Number(url.searchParams.get("page") ?? "1"), Number(url.searchParams.get("limit") ?? "20")));
     }),
 
+    http.get("*/api/v1/enrollment/certificates/:id/pdf", ({ request, params }) => {
+      const who = callerOf(request);
+      if (!who) return envelope(401, "UNAUTHORIZED", "missing or invalid token");
+      const c = enrollmentFixtures.certificates.find((x) => x.id === params["id"] && x.studentId === who.userId);
+      if (!c) return envelope(404, "NOT_FOUND", "resource not found");
+      const pdf = new TextEncoder().encode(`%PDF-1.4 synthetic ${c.code}`);
+      return new HttpResponse(pdf, { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="${c.code}.pdf"`, "X-Verification-Code": c.code } });
+    }),
+
     http.post("*/api/v1/enrollment/certificates", async ({ request }) => {
       const who = callerOf(request);
       if (!who) return envelope(401, "UNAUTHORIZED", "missing or invalid token");

@@ -27,11 +27,11 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}): Promise<T> {
+async function request<T>(method: string, path: string, body?: unknown, options: RequestOptions = {}, accept = "application/json"): Promise<T> {
   if (!path.startsWith("/")) throw new Error(`relative path expected, got "${path}"`);
   const url = new URL(path, "http://gateway.test");
   for (const [k, v] of Object.entries(options.query ?? {})) if (v !== undefined) url.searchParams.set(k, String(v));
-  const headers = new Headers({ Accept: "application/json", "X-Correlation-Id": crypto.randomUUID() });
+  const headers = new Headers({ Accept: accept, "X-Correlation-Id": crypto.randomUUID() });
   const token = testSession.token();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   if (body !== undefined) headers.set("Content-Type", "application/json");
@@ -45,6 +45,11 @@ async function request<T>(method: string, path: string, body?: unknown, options:
     throw new ApiError(0, "NETWORK", "", "");
   }
   if (options.signal?.aborted) throw new DOMException("aborted", "AbortError");
+  if (response.ok && accept !== "application/json") {
+    const filename = /filename="?([^";]+)"?/i.exec(response.headers.get("Content-Disposition") ?? "")?.[1];
+    const download = { blob: await response.blob(), contentType: response.headers.get("Content-Type") ?? accept, headers: response.headers, ...(filename ? { filename } : {}) };
+    return download as T;
+  }
   const text = response.status === 204 ? "" : await response.text();
   const parsed: unknown = text ? JSON.parse(text) : undefined;
   if (response.ok) return parsed as T;
@@ -61,6 +66,8 @@ export const apiClient = {
   put: <T>(path: string, body?: unknown, options?: RequestOptions) => request<T>("PUT", path, body, options),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) => request<T>("PATCH", path, body, options),
   del: <T = undefined>(path: string, options?: RequestOptions) => request<T>("DELETE", path, undefined, options),
+  download: (path: string, options?: RequestOptions & { accept?: string }) =>
+    request<{ blob: Blob; contentType: string; filename?: string; headers: Headers }>("GET", path, undefined, options, options?.accept ?? "application/pdf"),
 };
 
 export type ApiClient = typeof apiClient;

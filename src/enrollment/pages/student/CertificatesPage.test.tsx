@@ -90,4 +90,41 @@ describe("CertificatesPage", () => {
     await user.click(within(alert).getByRole("button", { name: "Retry" }));
     expect(await screen.findByText("You have no certificates yet.")).toBeInTheDocument();
   });
+
+  it("downloads the PDF of a certificate through the shell's client with its code as the file name", async () => {
+    const user = userEvent.setup();
+    asLaura();
+    const created: string[] = [];
+    const clicked: string[] = [];
+    URL.createObjectURL = vi.fn(() => "blob:certificate");
+    URL.revokeObjectURL = vi.fn();
+    vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(function (this: HTMLAnchorElement) {
+      clicked.push(this.download);
+    });
+    server.events.on("request:start", ({ request }) => { if (request.url.endsWith("/pdf")) created.push(request.headers.get("accept") ?? ""); });
+    renderPage();
+    await screen.findByText("You have no certificates yet.");
+    await user.selectOptions(screen.getByLabelText("Certificate type"), "estudios");
+    await user.click(screen.getByRole("button", { name: "Issue certificate" }));
+    const issued = await screen.findByRole("status");
+    const code = /QMP-[A-Z0-9]{8}/.exec(issued.textContent ?? "")![0];
+
+    await user.click(await screen.findByRole("button", { name: `Download the PDF of ${code}` }));
+
+    await vi.waitFor(() => expect(clicked).toEqual([`${code}.pdf`]));
+    expect(created).toEqual(["application/pdf"]);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:certificate");
+  });
+
+  it("says why a PDF could not be downloaded", async () => {
+    const user = userEvent.setup();
+    asLaura();
+    server.use(http.get("*/api/v1/enrollment/certificates/:id/pdf", () => HttpResponse.json({ error: "NOT_FOUND", message: "resource not found", traceId: "t-pdf" }, { status: 404 })));
+    renderPage();
+    await screen.findByText("You have no certificates yet.");
+    await user.click(screen.getByRole("button", { name: "Issue certificate" }));
+    await screen.findByRole("status");
+    await user.click(await screen.findByRole("button", { name: /Download the PDF of/ }));
+    expect(await screen.findByText("Reference: t-pdf")).toBeInTheDocument();
+  });
 });
