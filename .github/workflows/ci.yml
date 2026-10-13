@@ -36,20 +36,6 @@ jobs:
         run: docker build -f deploy/Dockerfile -t qone-enrollment-portal:ci .
       - name: Run it and smoke-check it
         run: |
-          docker run -d --rm --name enrollment-ci -p 5003:80 qone-enrollment-portal:ci
-          for i in $(seq 1 20); do curl -fs http://localhost:5003/health && break; sleep 1; done
-          sh deploy/smoke.sh http://localhost:5003
-          docker stop enrollment-ci
-  image:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    needs: build-and-test
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build the image
-        run: docker build -f deploy/Dockerfile -t qone-enrollment-portal:ci .
-      - name: Run it and smoke-check it
-        run: |
           docker run -d --rm --name portal-ci -p 5003:80 qone-enrollment-portal:ci
           for i in $(seq 1 20); do curl -fs http://localhost:5003/health && break; sleep 1; done
           sh deploy/smoke.sh http://localhost:5003
