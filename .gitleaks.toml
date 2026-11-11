@@ -1,0 +1,14 @@
+# gitleaks configuration, read by the secret-scan step of CI (HU-PLT-005, qone-docs#55):
+# every default rule plus OpenAI keys of any kind, which the advisor stack handles.
+[extend]
+useDefault = true
+
+# Same id as the default rule (which only knows the legacy T3BlbkFJ keys), so this one replaces its
+# regex. The whole key is group 1, the group the secret and its entropy are read from.
+[[rules]]
+id = "openai-api-key"
+description = "OpenAI API key (project, service account, admin or legacy)"
+regex = '''\b(sk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,})'''
+secretGroup = 1
+entropy = 3
+keywords = ["sk-"]

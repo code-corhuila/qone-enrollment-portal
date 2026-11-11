@@ -8,7 +8,7 @@ import { App } from "./App";
 // and the pensum on its index route; every link stays under the mount point.
 describe("enrollment App", () => {
   it("renders the heading, the navigation and the pensum on the index route, under /enrollment", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     render(
       <MemoryRouter initialEntries={["/enrollment"]}>
         <Routes>
@@ -25,7 +25,7 @@ describe("enrollment App", () => {
   });
 
   it("marks the tab of the current page so the shell can draw it as active", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     render(
       <MemoryRouter initialEntries={["/enrollment/schedule"]}>
         <Routes>
