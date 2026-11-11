@@ -20,49 +20,49 @@ function renderPage(sectionId: string) {
     </MemoryRouter>,
   );
 }
-const asCarlos = () => testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Carlos Ramírez" });
+const asProfessor01 = () => testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Profesor Demo 01" });
 
 // HU-WEB-002: the professor's roster of a section (EN-10), reached from "My sections" of the
 // catalog portal. PROFESSOR or ADMIN; four states (Annex H).
 describe("RosterPage", () => {
   it("shows the section heading and the confirmed students with their enrollment date", async () => {
-    asCarlos();
+    asProfessor01();
     renderPage(isw604g1.id);
     expect(screen.getByRole("status")).toHaveTextContent("Loading the roster");
 
     expect(await screen.findByRole("heading", { level: 3, name: "ISW-604 Sistemas Distribuidos, group 1" })).toBeInTheDocument();
-    expect(screen.getByText("Carlos Ramírez, MON 08:00-10:00, WED 08:00-10:00")).toBeInTheDocument();
+    expect(screen.getByText("Profesor Demo 01, MON 08:00-10:00, WED 08:00-10:00")).toBeInTheDocument();
     const table = screen.getByRole("table", { name: "Roster" });
     const rows = within(table).getAllByRole("row").slice(1);
     expect(rows.map((r) => r.textContent)).toEqual([
-      expect.stringContaining("María José Cabrera"),
-      expect.stringContaining("Andrés Pineda"),
-      expect.stringContaining("Valentina Suárez"),
+      expect.stringContaining("Estudiante Demo 03"),
+      expect.stringContaining("Estudiante Demo 04"),
+      expect.stringContaining("Estudiante Demo 05"),
     ]);
     expect(rows[0]).toHaveTextContent("2026-08-15");
     expect(screen.getByText("3 students confirmed, 27 seats left of 30")).toBeInTheDocument();
   });
 
   it("shows the empty state for a section without students", async () => {
-    asCarlos();
+    asProfessor01();
     renderPage(isw604g2.id);
     expect(await screen.findByText("No student has confirmed this section yet.")).toBeInTheDocument();
   });
 
   it("refuses a student and accepts an admin", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     const { unmount } = renderPage(isw604g1.id);
     expect(screen.getByRole("alert")).toHaveTextContent("You do not have permission for this section.");
     unmount();
 
-    testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Patricia Mora" });
+    testSession.signInAs({ id: "33333333-3333-4333-8333-333333333331", role: "ADMIN", name: "Administrador" });
     renderPage(isw604g1.id);
     expect(await screen.findByRole("table", { name: "Roster" })).toBeInTheDocument();
   });
 
   it("shows the error with the traceId and retries", async () => {
     const user = userEvent.setup();
-    asCarlos();
+    asProfessor01();
     server.use(http.get("*/api/v1/enrollment/sections/:sectionId/roster", () => HttpResponse.json({ error: "INTERNAL_ERROR", message: "x", traceId: "t-r1" }, { status: 500 }), { once: true }));
     renderPage(isw604g1.id);
 

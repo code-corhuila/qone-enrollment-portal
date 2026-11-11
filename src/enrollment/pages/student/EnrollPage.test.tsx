@@ -19,7 +19,7 @@ function renderPage(code = "ISW-604") {
   );
 }
 
-const asLaura = () => testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+const asStudent01 = () => testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
 beforeEach(() => resetSagas());
 
 // HU-ENR-002: a student picks a group and starts the enroll-student saga (WF-02); the outcome
@@ -27,14 +27,14 @@ beforeEach(() => resetSagas());
 // while pending, one Idempotency-Key per intention reused on retry, four states.
 describe("EnrollPage", () => {
   it("lists the groups of the subject with professor, schedule and seats, and disables full ones", async () => {
-    asLaura();
+    asStudent01();
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading the groups");
 
     const table = await screen.findByRole("table", { name: "Groups of ISW-604" });
     const rows = within(table).getAllByRole("row").slice(1);
     expect(rows).toHaveLength(3);
-    expect(rows[0]).toHaveTextContent("Carlos Ramírez");
+    expect(rows[0]).toHaveTextContent("Profesor Demo 01");
     expect(rows[0]).toHaveTextContent("MON 08:00-10:00, WED 08:00-10:00");
     expect(within(rows[0]!).getByRole("button", { name: "Enroll in group 1" })).toBeEnabled();
     expect(within(rows[2]!).getByText("Full")).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe("EnrollPage", () => {
 
   it("enrolls through the saga and shows the confirmation with a link to my enrollments", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     renderPage();
     const table = await screen.findByRole("table", { name: "Groups of ISW-604" });
 
@@ -57,7 +57,7 @@ describe("EnrollPage", () => {
 
   it("shows the reason of a compensated saga as the person reads it (tuition unpaid)", async () => {
     const user = userEvent.setup();
-    testSession.signInAs({ id: enrollmentFixtures.santiago, role: "STUDENT", name: "Santiago Rojas" });
+    testSession.signInAs({ id: enrollmentFixtures.student02, role: "STUDENT", name: "Estudiante Demo 02" });
     renderPage("ISW-602");
     await user.click(await screen.findByRole("button", { name: "Enroll in group 1" }));
 
@@ -67,10 +67,10 @@ describe("EnrollPage", () => {
 
   it("disables the button while the saga runs, keeps polling a RUNNING saga, and reuses the key on retry after a failure", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     const keys: string[] = [];
     let calls = 0;
-    const running = { id: "s-run", type: "enroll-student", studentId: enrollmentFixtures.laura, sectionId: "x", origin: "UI", status: "RUNNING", completedSteps: ["check-tuition"], createdAt: "2026-10-12T00:00:00Z", updatedAt: "2026-10-12T00:00:00Z" };
+    const running = { id: "s-run", type: "enroll-student", studentId: enrollmentFixtures.student01, sectionId: "x", origin: "UI", status: "RUNNING", completedSteps: ["check-tuition"], createdAt: "2026-10-12T00:00:00Z", updatedAt: "2026-10-12T00:00:00Z" };
     server.use(
       http.post("*/api/v1/sagas/enroll-student", ({ request }) => {
         keys.push(request.headers.get("idempotency-key") ?? "");
@@ -95,7 +95,7 @@ describe("EnrollPage", () => {
   });
 
   it("shows the permission notice to a professor", () => {
-    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Profesor Demo 01" });
     renderPage();
     expect(screen.getByRole("alert")).toHaveTextContent("You do not have permission for this section.");
   });

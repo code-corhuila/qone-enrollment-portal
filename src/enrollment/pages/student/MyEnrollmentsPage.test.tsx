@@ -18,7 +18,7 @@ const renderPage = () =>
 // (a rejected attempt is a recorded fact, D-01).
 describe("MyEnrollmentsPage", () => {
   it("lists my enrollments with subject, group, schedule and status", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     renderPage();
 
     const table = await screen.findByRole("table", { name: "My enrollments" });
@@ -32,11 +32,11 @@ describe("MyEnrollmentsPage", () => {
   });
 
   it("shows a rejected attempt with the reason the person understands", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.santiago, role: "STUDENT", name: "Santiago Rojas" });
+    testSession.signInAs({ id: enrollmentFixtures.student02, role: "STUDENT", name: "Estudiante Demo 02" });
     server.use(
       http.get("*/api/v1/enrollment/enrollments/me", () =>
         HttpResponse.json({
-          data: [{ ...enrollmentFixtures.enrollments[0]!, id: "r-1", studentId: enrollmentFixtures.santiago, studentName: "Santiago Rojas", status: "REJECTED", rejectionReason: "TUITION_UNPAID" }],
+          data: [{ ...enrollmentFixtures.enrollments[0]!, id: "r-1", studentId: enrollmentFixtures.student02, studentName: "Estudiante Demo 02", status: "REJECTED", rejectionReason: "TUITION_UNPAID" }],
           meta: { page: 1, limit: 20, total: 1, totalPages: 1 },
         }),
       ),
@@ -50,7 +50,7 @@ describe("MyEnrollmentsPage", () => {
 
   it("shows the empty state, and the error with retry", async () => {
     const user = userEvent.setup();
-    testSession.signInAs({ id: enrollmentFixtures.santiago, role: "STUDENT", name: "Santiago Rojas" });
+    testSession.signInAs({ id: enrollmentFixtures.student02, role: "STUDENT", name: "Estudiante Demo 02" });
     const { unmount } = renderPage();
     expect(await screen.findByText("You have no enrollments this term.")).toBeInTheDocument();
     unmount();
