@@ -4,10 +4,11 @@
 useDefault = true
 
 # Same id as the default rule (which only knows the legacy T3BlbkFJ keys), so this one replaces its
-# regex. The whole key is group 1: the default rule reads its secret (and entropy) from group 1.
+# regex. The whole key is group 1, the group the secret and its entropy are read from.
 [[rules]]
 id = "openai-api-key"
 description = "OpenAI API key (project, service account, admin or legacy)"
-regex = '''(sk-(proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,})'''
+regex = '''\b(sk-(?:proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,})'''
 secretGroup = 1
+entropy = 3
 keywords = ["sk-"]
