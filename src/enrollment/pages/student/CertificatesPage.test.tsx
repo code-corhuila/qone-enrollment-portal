@@ -14,14 +14,14 @@ const renderPage = () =>
       <CertificatesPage />
     </MemoryRouter>,
   );
-const asLaura = () => testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+const asStudent01 = () => testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
 beforeEach(() => resetCertificates());
 
 // HU-CER-001: issue a certificate once (idempotent, D-12), list mine with their public codes,
 // and verify any code. Annex H: button disabled while pending, error beside the field, four states.
 describe("CertificatesPage", () => {
   it("shows the empty state and the five types to issue", async () => {
-    asLaura();
+    asStudent01();
     renderPage();
 
     expect(await screen.findByText("You have no certificates yet.")).toBeInTheDocument();
@@ -30,7 +30,7 @@ describe("CertificatesPage", () => {
 
   it("issues a certificate and lists it with its code, then refuses to duplicate the same intention", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     const keys: string[] = [];
     server.events.on("request:start", ({ request }) => { const k = request.headers.get("idempotency-key"); if (k) keys.push(k); });
     renderPage();
@@ -49,7 +49,7 @@ describe("CertificatesPage", () => {
 
   it("shows the precondition of the service beside the form (unpaid tuition)", async () => {
     const user = userEvent.setup();
-    testSession.signInAs({ id: enrollmentFixtures.santiago, role: "STUDENT", name: "Santiago Rojas" });
+    testSession.signInAs({ id: enrollmentFixtures.student02, role: "STUDENT", name: "Estudiante Demo 02" });
     renderPage();
     await screen.findByText("You have no certificates yet.");
 
@@ -62,7 +62,7 @@ describe("CertificatesPage", () => {
 
   it("verifies a code: valid with the holder, unknown as not valid", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     renderPage();
     await screen.findByText("You have no certificates yet.");
     await user.selectOptions(screen.getByLabelText("Certificate type"), "estudios");
@@ -71,7 +71,7 @@ describe("CertificatesPage", () => {
 
     await user.type(screen.getByLabelText("Verification code"), code);
     await user.click(screen.getByRole("button", { name: "Verify" }));
-    expect(await screen.findByText(`Valid: Studies certificate of Laura Gómez.`)).toBeInTheDocument();
+    expect(await screen.findByText(`Valid: Studies certificate of Estudiante Demo 01.`)).toBeInTheDocument();
 
     await user.clear(screen.getByLabelText("Verification code"));
     await user.type(screen.getByLabelText("Verification code"), "QMP-NOPE0000");
@@ -81,7 +81,7 @@ describe("CertificatesPage", () => {
 
   it("shows the error of the list with retry", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     server.use(http.get("*/api/v1/enrollment/certificates/me", () => HttpResponse.json({ error: "INTERNAL_ERROR", message: "x", traceId: "t-c1" }, { status: 500 }), { once: true }));
     renderPage();
 
@@ -93,7 +93,7 @@ describe("CertificatesPage", () => {
 
   it("downloads the PDF of a certificate through the shell's client with its code as the file name", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     const created: string[] = [];
     const clicked: string[] = [];
     URL.createObjectURL = vi.fn(() => "blob:certificate");
@@ -118,7 +118,7 @@ describe("CertificatesPage", () => {
 
   it("says why a PDF could not be downloaded", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     server.use(http.get("*/api/v1/enrollment/certificates/:id/pdf", () => HttpResponse.json({ error: "NOT_FOUND", message: "resource not found", traceId: "t-pdf" }, { status: 404 })));
     renderPage();
     await screen.findByText("You have no certificates yet.");

@@ -9,11 +9,11 @@ import { sagaApi } from "./sagaApi";
 
 // Core level: typed calls over shell/apiClient (stubbed in tests). Paths, query parameters and
 // the Idempotency-Key are the contract; nothing here knows the gateway.
-const asLaura = () => testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+const asStudent01 = () => testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
 
 describe("enrollmentApi", () => {
   it("reads my record and my pensum (EN-02, EN-03)", async () => {
-    asLaura();
+    asStudent01();
     const record = await enrollmentApi.myRecord();
     const pensum = await enrollmentApi.myPensum();
 
@@ -23,7 +23,7 @@ describe("enrollmentApi", () => {
   });
 
   it("lists my enrollments newest first with the contract's page and filters (EN-07)", async () => {
-    asLaura();
+    asStudent01();
     const page = await enrollmentApi.myEnrollments({ term: "2026-B", status: "CONFIRMED", limit: 2 });
 
     expect(page.meta).toEqual({ page: 1, limit: 2, total: 4, totalPages: 2 });
@@ -31,29 +31,29 @@ describe("enrollmentApi", () => {
   });
 
   it("refuses another student's enrollment with 403 and a professor's record read with 403", async () => {
-    asLaura();
-    const maria = enrollmentFixtures.enrollments.find((e) => e.studentId === enrollmentFixtures.maria)!;
-    await expect(enrollmentApi.getEnrollment(maria.id)).rejects.toMatchObject({ status: 403, code: "FORBIDDEN" });
+    asStudent01();
+    const student03 = enrollmentFixtures.enrollments.find((e) => e.studentId === enrollmentFixtures.student03)!;
+    await expect(enrollmentApi.getEnrollment(student03.id)).rejects.toMatchObject({ status: 403, code: "FORBIDDEN" });
 
-    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Profesor Demo 01" });
     await expect(enrollmentApi.myRecord()).rejects.toMatchObject({ status: 403 });
   });
 
   it("reads my schedule (EN-09) and, as a professor, a roster (EN-10)", async () => {
-    asLaura();
+    asStudent01();
     const schedule = await enrollmentApi.mySchedule({ term: "2026-B" });
     expect(schedule.data.map((i) => i.subjectCode)).toEqual(["ISW-601", "ISW-603", "ISW-605", "MAT-501"]);
 
-    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Profesor Demo 01" });
     const isw604g1 = catalogFixtures.sections[4]!;
     const roster = await enrollmentApi.roster(isw604g1.id);
-    expect(roster.data.map((r) => r.studentName)).toEqual(["María José Cabrera", "Andrés Pineda", "Valentina Suárez"]);
+    expect(roster.data.map((r) => r.studentName)).toEqual(["Estudiante Demo 03", "Estudiante Demo 04", "Estudiante Demo 05"]);
   });
 
   it("issues a certificate with the Idempotency-Key it was given (EN-13)", async () => {
-    asLaura();
+    asStudent01();
     let key: string | null = null;
-    server.use(http.post("*/api/v1/enrollment/certificates", ({ request }) => { key = request.headers.get("idempotency-key"); return HttpResponse.json({ id: "c", studentId: enrollmentFixtures.laura, studentName: "Laura Gómez", type: "estudios", code: "QMP-ABCDEF12", term: "2026-B", issuedAt: "2026-10-12T00:00:00Z" }, { status: 201 }); }));
+    server.use(http.post("*/api/v1/enrollment/certificates", ({ request }) => { key = request.headers.get("idempotency-key"); return HttpResponse.json({ id: "c", studentId: enrollmentFixtures.student01, studentName: "Estudiante Demo 01", type: "estudios", code: "QMP-ABCDEF12", term: "2026-B", issuedAt: "2026-10-12T00:00:00Z" }, { status: 201 }); }));
 
     const c = await enrollmentApi.issueCertificate("estudios", "cert-estudios-0001");
 
@@ -64,28 +64,28 @@ describe("enrollmentApi", () => {
 
 describe("catalogApi and sagaApi", () => {
   it("lists the groups of a subject for the term (CA-05) and reads one section (CA-08)", async () => {
-    asLaura();
+    asStudent01();
     const groups = await catalogApi.sectionsOf("ISW-604", "2026-B");
     expect(groups.data.map((s) => `g${s.groupNumber}:${s.seatsAvailable}`)).toEqual(["g1:27", "g2:30", "g3:0"]);
     await expect(catalogApi.getSection(groups.data[0]!.id)).resolves.toMatchObject({ subjectName: "Sistemas Distribuidos" });
   });
 
   it("starts the saga with the Idempotency-Key and reads it by id (WF-02, WF-03)", async () => {
-    asLaura();
+    asStudent01();
     let key: string | null = null;
     let body: unknown;
-    const saga = { id: "s-1", type: "enroll-student", studentId: enrollmentFixtures.laura, sectionId: "x", origin: "UI", status: "COMPLETED", completedSteps: [], createdAt: "2026-10-12T00:00:00Z", updatedAt: "2026-10-12T00:00:00Z" };
+    const saga = { id: "s-1", type: "enroll-student", studentId: enrollmentFixtures.student01, sectionId: "x", origin: "UI", status: "COMPLETED", completedSteps: [], createdAt: "2026-10-12T00:00:00Z", updatedAt: "2026-10-12T00:00:00Z" };
     server.use(
       http.post("*/api/v1/sagas/enroll-student", async ({ request }) => { key = request.headers.get("idempotency-key"); body = await request.json(); return HttpResponse.json(saga, { status: 201 }); }),
       http.get("*/api/v1/sagas/s-1", () => HttpResponse.json(saga)),
     );
 
-    const started = await sagaApi.startEnrollStudent({ studentId: enrollmentFixtures.laura, sectionId: "x", origin: "UI" }, "enroll-x-0001");
+    const started = await sagaApi.startEnrollStudent({ studentId: enrollmentFixtures.student01, sectionId: "x", origin: "UI" }, "enroll-x-0001");
     const read = await sagaApi.getSaga("s-1");
 
     expect(started.status).toBe("COMPLETED");
     expect(read.id).toBe("s-1");
     expect(key).toBe("enroll-x-0001");
-    expect(body).toEqual({ studentId: enrollmentFixtures.laura, sectionId: "x", origin: "UI" });
+    expect(body).toEqual({ studentId: enrollmentFixtures.student01, sectionId: "x", origin: "UI" });
   });
 });

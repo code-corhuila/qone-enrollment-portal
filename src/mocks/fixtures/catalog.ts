@@ -34,9 +34,9 @@ export const subjects: SubjectView[] = [
 ];
 
 const P = {
-  carlos: { id: "22222222-2222-4222-8222-222222222221", name: "Carlos Ramírez" },
-  ana: { id: "22222222-2222-4222-8222-222222222222", name: "Ana Torres" },
-  jorge: { id: "22222222-2222-4222-8222-222222222223", name: "Jorge Medina" },
+  professor01: { id: "22222222-2222-4222-8222-222222222221", name: "Profesor Demo 01" },
+  professor02: { id: "22222222-2222-4222-8222-222222222222", name: "Profesor Demo 02" },
+  professor03: { id: "22222222-2222-4222-8222-222222222223", name: "Profesor Demo 03" },
 } as const;
 
 const slot = (day: Slot["day"], start: string, end: string): Slot => ({ day, start, end });
@@ -47,17 +47,17 @@ function section(n: number, subjectCode: string, groupNumber: number, professor:
 }
 
 export const sections: Section[] = [
-  section(1, "ISW-601", 1, "ana", 30, 29, [slot("TUE", "08:00", "10:00"), slot("THU", "08:00", "10:00")]),
-  section(2, "ISW-603", 1, "jorge", 30, 29, [slot("MON", "10:00", "12:00"), slot("WED", "10:00", "12:00")]),
-  section(3, "ISW-605", 1, "ana", 30, 29, [slot("TUE", "14:00", "16:00"), slot("THU", "14:00", "16:00")]),
-  section(4, "MAT-501", 1, "jorge", 30, 29, [slot("FRI", "14:00", "17:00")]),
-  section(5, "ISW-604", 1, "carlos", 30, 27, [slot("MON", "08:00", "10:00"), slot("WED", "08:00", "10:00")]),
-  section(6, "ISW-604", 2, "ana", 30, 30, [slot("TUE", "08:00", "10:00"), slot("THU", "08:00", "10:00")]),
-  section(7, "ISW-604", 3, "jorge", 3, 0, [slot("FRI", "08:00", "12:00")]),
-  section(8, "ISW-501", 2, "carlos", 30, 0, [slot("TUE", "10:00", "12:00"), slot("THU", "10:00", "12:00")]),
-  section(9, "RED-501", 1, "carlos", 30, 30, [slot("FRI", "08:00", "11:00")]),
-  section(10, "ISW-602", 1, "ana", 30, 30, [slot("TUE", "16:00", "18:00"), slot("THU", "16:00", "18:00")]),
-  section(11, "ISW-703", 1, "jorge", 30, 30, [slot("WED", "16:00", "19:00")]),
+  section(1, "ISW-601", 1, "professor02", 30, 29, [slot("TUE", "08:00", "10:00"), slot("THU", "08:00", "10:00")]),
+  section(2, "ISW-603", 1, "professor03", 30, 29, [slot("MON", "10:00", "12:00"), slot("WED", "10:00", "12:00")]),
+  section(3, "ISW-605", 1, "professor02", 30, 29, [slot("TUE", "14:00", "16:00"), slot("THU", "14:00", "16:00")]),
+  section(4, "MAT-501", 1, "professor03", 30, 29, [slot("FRI", "14:00", "17:00")]),
+  section(5, "ISW-604", 1, "professor01", 30, 27, [slot("MON", "08:00", "10:00"), slot("WED", "08:00", "10:00")]),
+  section(6, "ISW-604", 2, "professor02", 30, 30, [slot("TUE", "08:00", "10:00"), slot("THU", "08:00", "10:00")]),
+  section(7, "ISW-604", 3, "professor03", 3, 0, [slot("FRI", "08:00", "12:00")]),
+  section(8, "ISW-501", 2, "professor01", 30, 0, [slot("TUE", "10:00", "12:00"), slot("THU", "10:00", "12:00")]),
+  section(9, "RED-501", 1, "professor01", 30, 30, [slot("FRI", "08:00", "11:00")]),
+  section(10, "ISW-602", 1, "professor02", 30, 30, [slot("TUE", "16:00", "18:00"), slot("THU", "16:00", "18:00")]),
+  section(11, "ISW-703", 1, "professor03", 30, 30, [slot("WED", "16:00", "19:00")]),
 ];
 
 export function paginate<T>(rows: readonly T[], page: number, limit: number): Page<T> {

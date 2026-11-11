@@ -14,15 +14,15 @@ function record(n: number, studentName: string, semester: number, passedCodes: s
 }
 
 export const records: AcademicRecord[] = [
-  record(1, "Laura Gómez", 6, ["ISW-501", "ISW-502", "RED-501", "HUM-501"]),
-  record(2, "Santiago Rojas", 5, ["ISW-501"]),
-  record(3, "María José Cabrera", 6, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501"]),
-  record(4, "Andrés Pineda", 7, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501", "ISW-601"]),
-  record(5, "Valentina Suárez", 7, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501", "ISW-601"]),
+  record(1, "Estudiante Demo 01", 6, ["ISW-501", "ISW-502", "RED-501", "HUM-501"]),
+  record(2, "Estudiante Demo 02", 5, ["ISW-501"]),
+  record(3, "Estudiante Demo 03", 6, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501"]),
+  record(4, "Estudiante Demo 04", 7, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501", "ISW-601"]),
+  record(5, "Estudiante Demo 05", 7, ["ISW-501", "ISW-502", "RED-501", "HUM-501", "MAT-501", "ISW-601"]),
 ];
 
-/** billing_tuition_view: Santiago's invoice is ISSUED (the tuition gate demo); the rest PAID. */
-export const tuition: Record<string, "ISSUED" | "PAID"> = Object.fromEntries(records.map((r) => [r.studentId, r.studentName === "Santiago Rojas" ? "ISSUED" : "PAID"]));
+/** billing_tuition_view: Estudiante Demo 02's invoice is ISSUED (the tuition gate demo); the rest PAID. */
+export const tuition: Record<string, "ISSUED" | "PAID"> = Object.fromEntries(records.map((r) => [r.studentId, r.studentName === "Estudiante Demo 02" ? "ISSUED" : "PAID"]));
 
 let seq = 0;
 function confirmed(studentId: string, subjectCode: string, groupNumber: number): Enrollment {
@@ -48,19 +48,19 @@ function confirmed(studentId: string, subjectCode: string, groupNumber: number):
   };
 }
 
-const laura = records[0]!.studentId;
-const maria = records[2]!.studentId;
-const andres = records[3]!.studentId;
-const valentina = records[4]!.studentId;
+const student01 = records[0]!.studentId;
+const student03 = records[2]!.studentId;
+const student04 = records[3]!.studentId;
+const student05 = records[4]!.studentId;
 
 export const enrollments: Enrollment[] = [
-  confirmed(laura, "ISW-601", 1),
-  confirmed(laura, "ISW-603", 1),
-  confirmed(laura, "ISW-605", 1),
-  confirmed(laura, "MAT-501", 1),
-  confirmed(maria, "ISW-604", 1),
-  confirmed(andres, "ISW-604", 1),
-  confirmed(valentina, "ISW-604", 1),
+  confirmed(student01, "ISW-601", 1),
+  confirmed(student01, "ISW-603", 1),
+  confirmed(student01, "ISW-605", 1),
+  confirmed(student01, "MAT-501", 1),
+  confirmed(student03, "ISW-604", 1),
+  confirmed(student04, "ISW-604", 1),
+  confirmed(student05, "ISW-604", 1),
 ];
 
 export const certificates: Certificate[] = [];
@@ -94,4 +94,4 @@ export function pensumOf(student: AcademicRecord): Pensum {
   };
 }
 
-export const enrollmentFixtures = { records, enrollments, certificates, tuition, laura, maria, andres, valentina, santiago: records[1]!.studentId };
+export const enrollmentFixtures = { records, enrollments, certificates, tuition, student01, student03, student04, student05, student02: records[1]!.studentId };

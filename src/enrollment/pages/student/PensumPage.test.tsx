@@ -18,13 +18,13 @@ function renderPage() {
   );
 }
 
-const asLaura = () => testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+const asStudent01 = () => testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
 
 // HU-ENR-001: the pensum with every subject classified PASSED / IN_PROGRESS / AVAILABLE /
 // LOCKED, the progress totals, and the way into the enroll flow for an available subject.
 describe("PensumPage", () => {
   it("shows the progress and every subject with its state, grouped by semester", async () => {
-    asLaura();
+    asStudent01();
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading your pensum");
 
@@ -43,7 +43,7 @@ describe("PensumPage", () => {
 
   it("offers Enroll only on available subjects and routes to the enroll flow", async () => {
     const user = userEvent.setup();
-    asLaura();
+    asStudent01();
     renderPage();
     const s6 = await screen.findByRole("table", { name: "Semester 6" });
 
@@ -54,13 +54,13 @@ describe("PensumPage", () => {
   });
 
   it("shows the permission notice to a professor", () => {
-    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Carlos Ramírez" });
+    testSession.signInAs({ id: "22222222-2222-4222-8222-222222222221", role: "PROFESSOR", name: "Profesor Demo 01" });
     renderPage();
     expect(screen.getByRole("alert")).toHaveTextContent("You do not have permission for this section.");
   });
 
   it("shows the error with the traceId and retries", async () => {
-    asLaura();
+    asStudent01();
     server.use(http.get("*/api/v1/enrollment/pensum/me", () => HttpResponse.json({ error: "SERVICE_UNAVAILABLE", message: "down", traceId: "t-p1" }, { status: 503 }), { once: true }));
     const user = userEvent.setup();
     renderPage();
