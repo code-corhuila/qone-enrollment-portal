@@ -19,11 +19,11 @@ describe("enrollment fixtures against qone-enrollment-api.yaml", () => {
 
   it("the derived pensum of every student matches Pensum (EN-03)", () => {
     for (const r of enrollmentFixtures.records) expectValid(enrollment.response("get", "/enrollment/pensum/me", 200), pensumOf(r), `pensum ${r.studentName}`);
-    const laura = pensumOf(enrollmentFixtures.records[0]!);
-    expect(laura.subjects.find((s) => s.code === "ISW-604")?.state).toBe("AVAILABLE");
-    expect(laura.subjects.find((s) => s.code === "ISW-601")?.state).toBe("IN_PROGRESS");
-    expect(laura.subjects.find((s) => s.code === "ISW-701")?.missingPrerequisites).toEqual(["ISW-604"]);
-    expect(laura.totals.subjectsPassed).toBe(4);
+    const student01 = pensumOf(enrollmentFixtures.records[0]!);
+    expect(student01.subjects.find((s) => s.code === "ISW-604")?.state).toBe("AVAILABLE");
+    expect(student01.subjects.find((s) => s.code === "ISW-601")?.state).toBe("IN_PROGRESS");
+    expect(student01.subjects.find((s) => s.code === "ISW-701")?.missingPrerequisites).toEqual(["ISW-604"]);
+    expect(student01.totals.subjectsPassed).toBe(4);
   });
 
   it("every enrollment matches Enrollment and the page matches EN-07's 200", () => {
@@ -32,7 +32,7 @@ describe("enrollment fixtures against qone-enrollment-api.yaml", () => {
   });
 
   it("the schedule and the roster pages match EN-09 and EN-10", () => {
-    const items = activeEnrollments(enrollmentFixtures.laura).map((e) => ({ enrollmentId: e.id, subjectCode: e.subjectCode, subjectName: e.subjectName, groupNumber: e.groupNumber, slots: e.slots }));
+    const items = activeEnrollments(enrollmentFixtures.student01).map((e) => ({ enrollmentId: e.id, subjectCode: e.subjectCode, subjectName: e.subjectName, groupNumber: e.groupNumber, slots: e.slots }));
     expectValid(enrollment.response("get", "/enrollment/schedule/me", 200), paginate(items, 1, 20), "schedule page");
     const roster = enrollmentFixtures.enrollments.filter((e) => e.subjectCode === "ISW-604").map((e) => ({ enrollmentId: e.id, studentId: e.studentId, studentName: e.studentName, enrolledAt: e.createdAt }));
     expectValid(enrollment.response("get", "/enrollment/sections/{sectionId}/roster", 200), paginate(roster, 1, 20), "roster page");

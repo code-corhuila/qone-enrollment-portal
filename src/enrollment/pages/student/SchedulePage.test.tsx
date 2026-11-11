@@ -16,7 +16,7 @@ const renderPage = () =>
 // HU-WEB-001: my weekly schedule - the confirmed classes of the term by day (EN-09).
 describe("SchedulePage", () => {
   it("shows the week with each class block under its day", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     renderPage();
     expect(screen.getByRole("status")).toHaveTextContent("Loading your schedule");
 
@@ -31,7 +31,7 @@ describe("SchedulePage", () => {
   });
 
   it("orders the blocks of a day by start time", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     renderPage();
     const week = await screen.findByRole("table", { name: "Weekly schedule" });
     const tueText = within(week).getByRole("row", { name: /^TUE/ }).textContent ?? "";
@@ -39,13 +39,13 @@ describe("SchedulePage", () => {
   });
 
   it("shows the empty state for a student without classes", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.santiago, role: "STUDENT", name: "Santiago Rojas" });
+    testSession.signInAs({ id: enrollmentFixtures.student02, role: "STUDENT", name: "Estudiante Demo 02" });
     renderPage();
     expect(await screen.findByText("You have no confirmed classes this term.")).toBeInTheDocument();
   });
 
   it("shows the error with the traceId", async () => {
-    testSession.signInAs({ id: enrollmentFixtures.laura, role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: enrollmentFixtures.student01, role: "STUDENT", name: "Estudiante Demo 01" });
     server.use(http.get("*/api/v1/enrollment/schedule/me", () => HttpResponse.json({ error: "INTERNAL_ERROR", message: "x", traceId: "t-s1" }, { status: 500 })));
     renderPage();
     expect(await screen.findByRole("alert")).toHaveTextContent("t-s1");

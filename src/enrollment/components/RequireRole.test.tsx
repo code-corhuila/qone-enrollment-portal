@@ -7,7 +7,7 @@ import { RequireRole } from "./RequireRole";
 // place, not a redirect (the shell owns navigation and the sign-in).
 describe("RequireRole", () => {
   it("renders the children for an allowed role", () => {
-    testSession.signInAs({ id: "a-1", role: "ADMIN", name: "Patricia Mora" });
+    testSession.signInAs({ id: "a-1", role: "ADMIN", name: "Administrador" });
     render(
       <RequireRole roles={["ADMIN"]}>
         <p>admin tools</p>
@@ -17,7 +17,7 @@ describe("RequireRole", () => {
   });
 
   it("shows the permission notice for another role and for a visitor without session", () => {
-    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Estudiante Demo 01" });
     const { unmount } = render(
       <RequireRole roles={["ADMIN"]}>
         <p>admin tools</p>
@@ -37,7 +37,7 @@ describe("RequireRole", () => {
   });
 
   it("follows a session change while mounted", () => {
-    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Laura Gómez" });
+    testSession.signInAs({ id: "s-1", role: "STUDENT", name: "Estudiante Demo 01" });
     render(
       <RequireRole roles={["ADMIN", "PROFESSOR"]}>
         <p>staff tools</p>
@@ -45,7 +45,7 @@ describe("RequireRole", () => {
     );
     expect(screen.getByRole("alert")).toBeInTheDocument();
 
-    act(() => testSession.signInAs({ id: "p-1", role: "PROFESSOR", name: "Carlos Ramírez" }));
+    act(() => testSession.signInAs({ id: "p-1", role: "PROFESSOR", name: "Profesor Demo 01" }));
 
     expect(screen.getByText("staff tools")).toBeInTheDocument();
   });
